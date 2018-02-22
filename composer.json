@@ -1,0 +1,19 @@
+{
+    "name": "vendor/infy",
+    "description": "Infinity Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Max Glazkov",
+            "email": "maksimglaz@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Infy\\Core\\": "core/"
+        }
+    }
+}
