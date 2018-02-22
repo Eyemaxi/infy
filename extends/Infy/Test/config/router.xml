@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config>
+    <routes>
+        <main>
+            <controller>MainController</controller>
+            <action>itemAction</action>
+            <dynamic_values>
+                <controller>MainController</controller>
+                <action>itemsAction</action>
+            </dynamic_values>
+        </main>
+    </routes>
+</config>
