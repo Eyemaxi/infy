@@ -1,11 +1,13 @@
 <?php
+namespace Infy\Core\Components;
+
 /**
  * Created by PhpStorm.
  * User: Max
  * Date: 20.12.2017
  * Time: 17:24
  */
-class Db
+class DataBase
 {
     public static function getConnection() {
         $xml = simplexml_load_file(ROOT . '/config/config.xml');
