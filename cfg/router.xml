@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <routes>
+        <main>
+            <module>Infy_Test</module>
+            <action>index</action>
+        </main>
+    </routes>
+</config>

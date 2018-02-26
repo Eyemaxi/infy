@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config>
     <module>
-        <NameSpace>Infy</NameSpace>
+        <Namespace>Infy</Namespace>
         <ModuleName>Test</ModuleName>
         <active>true</active>
     </module>

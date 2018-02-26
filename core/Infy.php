@@ -9,5 +9,27 @@ namespace Infy\Core;
 
 class Infy
 {
+    /**
+     * Redirect by URI
+     * @param $uri
+     */
+    protected function _redirect($uri)
+    {
+        header('Location: ' . $uri);
+        die();
+    }
 
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected function getModulePath(string $path)
+    {
+        return(implode( '\\', explode('_', $path)));
+    }
+
+    protected function toNameSpacePath(array $path)
+    {
+        return(implode('\\', $path));
+    }
 }

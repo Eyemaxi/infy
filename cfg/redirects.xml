@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <!-- If URI parameters is NULL-->
+    <root>main</root>
+    <redirects>
+        <general>
+            <new_route_param>main</new_route_param>
+        </general>
+    </redirects>
+</config>

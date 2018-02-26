@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 define('ROOT', dirname(__FILE__));
 //require_once(ROOT . '/components/Router.php');
 //require_once(ROOT . '/components/Db.php');
-require __DIR__ . 'vendor/autoload.php';
+require ROOT . '/vendor/autoload.php';
 
 // 3. Install connecting to the DB
 
