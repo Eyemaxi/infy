@@ -104,7 +104,7 @@ final class Router extends Infy
 
     private function getActionController($controllerPath, $moduleName, $uriParams)
     {
-        
+
     }
     /**
      * Return URI parameters
