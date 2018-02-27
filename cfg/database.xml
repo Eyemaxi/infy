@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <database>
+        <host>localhost</host>
+        <db>mvctest_db</db>
+        <user>root</user>
+        <pass></pass>
+        <charset>utf8</charset>
+    </database>
+</config>

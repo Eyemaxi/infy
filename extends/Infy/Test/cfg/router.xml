@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <routes>
+        <main>
+            <controller>MainController</controller>
+            <action>itemAction</action>
+        </main>
+    </routes>
+</config>

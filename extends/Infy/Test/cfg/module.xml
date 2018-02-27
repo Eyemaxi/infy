@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config>
+    <module>
+        <Namespace>Infy</Namespace>
+        <ModuleName>Test</ModuleName>
+        <active>true</active>
+    </module>
+</config>
