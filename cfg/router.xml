@@ -4,6 +4,9 @@
         <main>
             <module>Infy_Test</module>
             <action>index</action>
+            <products>
+                <module>Infy_Test</module>
+            </products>
         </main>
     </routes>
 </config>

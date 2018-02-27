@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <config>
-    <db_params>
+    <database>
         <host>localhost</host>
         <db>mvctest_db</db>
         <user>root</user>
         <pass></pass>
         <charset>utf8</charset>
-    </db_params>
+    </database>
 </config>

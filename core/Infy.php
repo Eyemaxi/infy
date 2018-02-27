@@ -23,13 +23,26 @@ class Infy
      * @param string $path
      * @return string
      */
-    protected function getModulePath(string $path)
+    protected function getModulePath($path)
     {
-        return(implode( '\\', explode('_', $path)));
+        return '\\' . (implode( '\\', explode('_', $path)));
     }
 
-    protected function toNameSpacePath(array $path)
+    /**
+     * @param array $path
+     * @param null $type
+     * @return string
+     */
+    protected function getFilePath(array $path, $type = null)
     {
-        return(implode('\\', $path));
+        foreach ($path as $key => $item) {
+            $path[$key] = ucfirst($item);
+        }
+
+        if ($type != null) {
+            return ucfirst($type) . '\\' . (implode('\\', $path));
+        } else {
+            return(implode('\\', $path));
+        }
     }
 }

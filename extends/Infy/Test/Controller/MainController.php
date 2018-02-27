@@ -9,11 +9,7 @@ namespace Infy\Test\Controller;
 
 class MainController
 {
-    public function itemAction(){
-        echo '<p>MainController::itemAction()</p>';
-    }
-
-    public function itemsAction(){
-        echo '<p>MainController::itemsAction()</p>';
+    public function indexAction($params){
+        echo '<p>MainController::indexAction()</p>';
     }
 }

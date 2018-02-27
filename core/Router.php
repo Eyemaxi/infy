@@ -7,7 +7,6 @@
  */
 namespace Infy\Core;
 use Infy\Core\Xml\Xml;
-use Infy\Core\Infy;
 
 final class Router extends Infy
 {
@@ -28,43 +27,28 @@ final class Router extends Infy
         $this->routes = Xml::getRoutes();
     }
 
+    /**
+     * Creating object class Controller and executing Action method
+     */
     public function run() {
-        /* Get ModulePath, Controller and Action for route */
+        /* Get Controller and Action for route */
         $currentRouteValues = $this -> getRouteValues();
+        $controllerPath = $currentRouteValues['controller'];
+        $actionName = $currentRouteValues['action'];
+        $actionParams = $currentRouteValues['params'];
 
-        if(isset($currentRouteValues['valuesRoute'])) {
-            $currentRouteValues = $currentRouteValues['currentRoute'];
-            $valuesRoute = $currentRouteValues['valuesRoute'];
-        }
-
-        if($currentRouteValues!= false) {
-            // Подключить файл класса-контроллера
-            $controllerFile = ROOT . '/controllers/' . $currentRouteValues->controller . '.php';
-
-            if(file_exists($controllerFile)) {
-                include_once($controllerFile);
-            }
-
-            // Создать объект, вызвать метод (т.е. action)
-            $controllerName = strval($currentRouteValues->controller);
-            $actionName = strval($currentRouteValues->action);
-
-            $controllerObject = new $controllerName;
-            if(isset($valuesRoute))
-            {
-                $controllerObject->$actionName($valuesRoute);
-            }
-            else {
-                $controllerObject->$actionName();
-            }
-
-        }
-        else {
-            echo '<p>Такой страницы не существует!</p>';
+        try {
+            $controllerName = new $controllerPath();
+            $controllerName -> $actionName($actionParams);
+        } catch (Exception $ex) {
+            echo '<p>ERROR</p>';
         }
     }
 
-
+    /**
+     * Return Controller Path, Action with Parameters
+     * @return array
+     */
     private function getRouteValues() {
         /* Get URI parameters */
         $uriParams = $this->getUriParams();
@@ -99,13 +83,28 @@ final class Router extends Infy
             return $this->getActionController($controllerPath, $currentRoute, $valuesRoute);
         } else {
             echo '<p>Page not found</p>';
+            die();
         }
     }
 
+    /**
+     * Get Controller Path, Action with Parameters
+     * @param $controllerPath
+     * @param $moduleName
+     * @param $uriParams
+     * @return array
+     */
     private function getActionController($controllerPath, $moduleName, $uriParams)
     {
-
+        $controllerPath = $this->getModulePath($moduleName->module) . '\\' . $this->getFilePath($controllerPath, 'controller') . 'Controller';
+        if (isset($moduleName->action)) {
+            $actionName = $moduleName->action . 'Action';
+        } else {
+            $actionName = 'indexAction';
+        }
+        return ['controller' => $controllerPath, 'action' => $actionName, 'params' => $uriParams];
     }
+
     /**
      * Return URI parameters
      * @return array
