@@ -6,9 +6,11 @@
  * Time: 17:21
  */
 namespace Infy\Core;
-use Infy\Core\Xml\Xml;
+use Infy\Core\Config\Xml;
+use Infy\Core\Config\Config;
+use Infy\Core\Infy;
 
-final class Router extends Infy
+final class Router
 {
     /**
      * @var \SimpleXMLElement
@@ -20,7 +22,10 @@ final class Router extends Infy
      */
     private $routes;
 
+    protected $files;
+
     public function __construct() {
+        $this->files = Xml::joinXmls();
         /* Get all redirects */
         $this->redirects = Xml::getRedirects();
         /* Get all routes */
@@ -96,7 +101,7 @@ final class Router extends Infy
      */
     private function getActionController($controllerPath, $moduleName, $uriParams)
     {
-        $controllerPath = $this->getModulePath($moduleName->module) . '\\' . $this->getFilePath($controllerPath, 'controller') . 'Controller';
+        $controllerPath = Config::getModulePath($moduleName->module) . '\\' . Config::getFilePath($controllerPath, 'controller') . 'Controller';
         if (isset($moduleName->action)) {
             $actionName = $moduleName->action . 'Action';
         } else {
@@ -125,7 +130,7 @@ final class Router extends Infy
             return trim($_SERVER['REQUEST_URI'], '/');
         } else {
             if (isset($this->redirects->root)) {
-                $this->_redirect(strval($this->redirects->root));
+                Infy::_redirect(strval($this->redirects->root));
             }
         }
     }
@@ -148,7 +153,7 @@ final class Router extends Infy
         }
 
         if ($redirectUri != '') {
-            $this->_redirect($redirectUri);
+            Infy::_redirect($redirectUri);
         }
     }
 
