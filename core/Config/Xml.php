@@ -117,10 +117,15 @@ class Xml
 
     private static function mergeSimpleXml(\SimpleXMLElement $router1, \SimpleXMLElement $router2)
     {
+        //$arrayXml = array_merge_recursive ((array) $router1, (array) ($router2));
+
         $xml = $router2;
         $router1 = self::xmlToArray($router1);
         $router2 = self::xmlToArray($router2);
-        $router = array_merge($router2, $router1);
+        $router = array_merge_recursive($router2, $router1);
+        $xml = new \SimpleXMLElement('<config/>');
+        array_walk_recursive($router, array ($xml, 'addChild'));
+        $xml->asXML();
         $path = '';
 
         while (1==1) {
