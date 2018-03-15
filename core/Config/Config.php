@@ -38,7 +38,7 @@ class Config
         }
     }
 
-    public static function extendsListValidate($extendsList)
+    public static function extendsNamesValidate($extendsList)
     {
         $patternExtends = "/^[a-zA-Z0-9]+$/";
         foreach ($extendsList as $key => $value) {

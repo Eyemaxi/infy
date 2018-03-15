@@ -25,7 +25,7 @@ final class Router
     protected $files;
 
     public function __construct() {
-        $this->files = Xml::joinXmls();
+        $this->files = Xml::mergeXmls();
         /* Get all redirects */
         $this->redirects = Xml::getRedirects();
         /* Get all routes */
