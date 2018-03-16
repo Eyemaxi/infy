@@ -6,7 +6,7 @@
  * Time: 13:26
  */
 
-namespace Infy\Test\Controller\Main;
+namespace Web4pro\Products\Controller\Main;
 
 
 class ProductsController

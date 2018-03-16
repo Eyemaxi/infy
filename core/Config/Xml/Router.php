@@ -6,10 +6,11 @@
  * Time: 12:58
  */
 
-namespace Infy\Core\Config;
+namespace Infy\Core\Config\Xml;
+use Infy\Core\Config\Config;
 
 
-class Xml
+class Router
 {
     /**
      * @param string $path
@@ -31,7 +32,7 @@ class Xml
     {
         if (file_exists($path . '/cfg/router.xml')) {
             $router = simplexml_load_file($path . '/cfg/router.xml');
-            return $router->routes;
+            return $router;
         }
     }
 
@@ -49,23 +50,10 @@ class Xml
 
     public static function mergeXmls()
     {
-//        $domxml = new \DOMDocument('1.0');
-//        $domxml->preserveWhiteSpace = false;
-//        $domxml->formatOutput = true;
-//        /* @var $xml SimpleXMLElement */
-//
-//
-//        $xml = new \SimpleXMLElement('<config/>');
-//        $routes = $xml->addChild('routes');
-//        $main = $routes->addChild('main');
-//        $module = $main->addChild('module', 'Infy_Test');
-//        $module->addChild('action', 'test');
-//        $main->addChild('action', 'test');
-//        $routes->addChild('name')->addChild('module', 'Infy_Name');
-//        $routes->addChild('qwerty')->addChild('module', 'Qwerty_Name');
-
-        $routes = simplexml_load_file(ROOT . '/cfg/router.xml');
-        $routes = $routes->routes;
+        $domxml = new \DOMDocument('1.0');
+        $domxml->preserveWhiteSpace = false;
+        $domxml->formatOutput = true;
+        $xml = new \SimpleXMLElement('<config/>');
 
         $dir = ROOT.'/extends';
         $namespaceList = Config::extendsNamesValidate(scandir($dir));
@@ -76,15 +64,13 @@ class Xml
                 $dirModule = $dirNamespace . '/' . $module;
                 $moduleRoutes = self::getModuleRoutes($dirModule);
                 if ($moduleRoutes != null) {
-                    self::mergeSimpleXml($routes, $moduleRoutes);
+                    $xml = self::mergeSimpleXml($xml, $moduleRoutes);
                 }
             }
         }
 
-//        $domxml->loadXML($xml->asXML());
-//        $domxml->save(ROOT . '/cfg/qwerty.xml');
-
-        return $namespaceList;
+        $domxml->loadXML($xml->asXML());
+        $domxml->save(ROOT . '/cfg/router.xml');
     }
 
     private static function getModuleRoutes($dir)
@@ -95,6 +81,7 @@ class Xml
             if ($moduleXml->active == 'true') {
                 $moduleName = strval($moduleXml->Namespace) . '_' . strval($moduleXml->ModuleName);
                 $routesXmls = $cfgXmls['routes'];
+                self::relationModuleController($moduleName, $routesXmls);
                 return $routesXmls;
             }
         } else {
@@ -113,34 +100,56 @@ class Xml
         }
     }
 
-
-
-    private static function mergeSimpleXml(\SimpleXMLElement $router1, \SimpleXMLElement $router2)
+    private static function relationModuleController($moduleName, \SimpleXMLElement &$routesXmls)
     {
-        //$arrayXml = array_merge_recursive ((array) $router1, (array) ($router2));
-
-        $xml = $router2;
-        $router1 = self::xmlToArray($router1);
-        $router2 = self::xmlToArray($router2);
-        $router = array_merge_recursive($router2, $router1);
-        $xml = new \SimpleXMLElement('<config/>');
-        array_walk_recursive($router, array ($xml, 'addChild'));
-        $xml->asXML();
-        $path = '';
-
-        while (1==1) {
-            foreach ($router1 as $key => $value) {
-                if (isset($router2[$key])) {
-                    $router1 = $value;
-                    $path = $xml->$value;
-                    continue;
-                } else {
-
+        foreach ($routesXmls as $key => $value) {
+            if(is_object($value)) {
+                if (isset($value->action) && !isset($value->module)) {
+                    $value->addChild('module', $moduleName);
                 }
+                self::relationModuleController($moduleName, $value);
             }
         }
+    }
 
-        return $router;
+
+
+    private static function mergeSimpleXml(\SimpleXMLElement $xml, \SimpleXMLElement $routes)
+    {
+        $router1 = self::xmlToArray($xml);
+        $router2 = self::xmlToArray($routes);
+        $router = array_merge_recursive($router2, $router1);
+        array_multisort($router, SORT_ASC, SORT_NATURAL);
+
+        //creating object of SimpleXMLElement
+        $xml = new \SimpleXMLElement("<config/>");
+
+        //function call to convert array to xml
+        self::arrayToXml($router,$xml);
+
+        return $xml;
+    }
+
+    private static function arrayToXml($array, &$xml)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                if ($key != 'action' && $key != 'module') {
+                    if (!is_numeric($key)) {
+                        $subnode = $xml->addChild("$key");
+                        self::arrayToXml($value, $subnode);
+                    } else {
+                        $subnode = $xml->addChild("item$key");
+                        self::arrayToXml($value, $subnode);
+                    }
+                } else {
+                    /********************       WARNING        ***************************/
+                    $xml->addChild("$key",htmlspecialchars("$value[0]"));
+                }
+            } else {
+                $xml->addChild("$key",htmlspecialchars("$value"));
+            }
+        }
     }
 
     private static function xmlToArray ($xmlObject, $out = array())
@@ -154,7 +163,5 @@ class Xml
         }
         return $out;
     }
-
-
 
 }

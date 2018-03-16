@@ -6,7 +6,7 @@
  * Time: 17:21
  */
 namespace Infy\Core;
-use Infy\Core\Config\Xml;
+use Infy\Core\Config\Xml\Router as RouterXml;
 use Infy\Core\Config\Config;
 use Infy\Core\Infy;
 
@@ -22,14 +22,11 @@ final class Router
      */
     private $routes;
 
-    protected $files;
-
     public function __construct() {
-        $this->files = Xml::mergeXmls();
         /* Get all redirects */
-        $this->redirects = Xml::getRedirects();
+        $this->redirects = RouterXml::getRedirects();
         /* Get all routes */
-        $this->routes = Xml::getRoutes();
+        $this->routes = RouterXml::getRoutes();
     }
 
     /**
@@ -62,7 +59,7 @@ final class Router
         $controllerPath = [];
 
         /* Saving Module name and Action name */
-        $currentRoute = $this->routes;
+        $currentRoute = $this->routes->routes;
 
         /* Is exist route */
         $isRoute = false;
@@ -105,7 +102,8 @@ final class Router
         if (isset($moduleName->action)) {
             $actionName = $moduleName->action . 'Action';
         } else {
-            $actionName = 'indexAction';
+            /*********************       CUSTOM_ERROR: PAGE DOES NOT EXIST        *************************/
+            //$actionName = 'indexAction';
         }
         return ['controller' => $controllerPath, 'action' => $actionName, 'params' => $uriParams];
     }

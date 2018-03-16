@@ -4,10 +4,7 @@
         <main>
             <products>
                 <action>index</action>
-                <module>Web4pro_Products</module>
             </products>
-            <action>index</action>
-            <module>Infy_Test</module>
         </main>
     </routes>
 </config>

@@ -2,22 +2,7 @@
 <config>
     <routes>
         <main>
-            <action>itemAction</action>
-            <qwe>
-                <action>itemAction</action>
-                <wewr>
-                    <action>itemAction</action>
-                    <qwe>
-                        <action>itemAction</action>
-                    </qwe>
-                </wewr>
-                <ukty>
-                    <action>itemAction</action>
-                </ukty>
-            </qwe>
+            <action>index</action>
         </main>
-        <qwe>
-            <action>itemAction</action>
-        </qwe>
     </routes>
 </config>
