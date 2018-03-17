@@ -1,6 +1,11 @@
 <?php
-
-//FRONT CONTROLLER
+/**
+ * Infy Framework
+ *
+ * @author    <maksimglaz@gmail.com>
+ * @copyright Copyright (c) 2018 Infy
+ * @license   https://www.infy-team.com/license.txt
+ */
 
 // 1. General settings
 ini_set('display_errors', 1);

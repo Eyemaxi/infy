@@ -48,7 +48,7 @@ class Router
         }
     }
 
-    public static function mergeXmls()
+    public static function mergeRoutes()
     {
         $domxml = new \DOMDocument('1.0');
         $domxml->preserveWhiteSpace = false;

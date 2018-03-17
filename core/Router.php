@@ -1,27 +1,47 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Max
- * Date: 20.12.2017
- * Time: 17:21
+ * Infy Framework
+ *
+ * @author    <maksimglaz@gmail.com>
+ * @category  Core
+ * @package   Infy\Core
+ * @copyright Copyright (c) 2018 Infy
+ * @license   https://www.infy-team.com/license.txt
  */
+
 namespace Infy\Core;
 use Infy\Core\Config\Xml\Router as RouterXml;
 use Infy\Core\Config\Config;
 use Infy\Core\Infy;
 
+/**
+ * Class Router
+ *
+ * @category Core
+ * @package  Infy\Core
+ * @author   <maksimglaz@gmail.com>
+ */
 final class Router
 {
     /**
+     * Object redirects.
+     *
      * @var \SimpleXMLElement
+     * @access private
      */
     private $redirects;
 
     /**
+     * Object routes.
+     *
      * @var \SimpleXMLElement
+     * @access private
      */
     private $routes;
 
+    /**
+     * Router constructor.
+     */
     public function __construct() {
         /* Get all redirects */
         $this->redirects = RouterXml::getRedirects();
