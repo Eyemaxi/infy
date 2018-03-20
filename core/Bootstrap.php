@@ -21,13 +21,11 @@ use Infy\Core\Config\Xml\Router as RouterXml;
  */
 class Bootstrap
 {
-
     /**
      * Launching the page
      *
      * @access public
      * @return void
-     * @author <maksimglaz@gmail.com>
      */
     public static function start()
     {
