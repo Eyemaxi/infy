@@ -13,6 +13,7 @@ error_reporting(E_ALL);
 
 // 2. Include files of system
 define('ROOT', dirname(__FILE__));
+/* Include autoloader */
 require ROOT . '/vendor/autoload.php';
 
 // 3. Install connecting to the DB

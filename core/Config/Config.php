@@ -50,4 +50,15 @@ class Config
         return $extendsList;
     }
 
+    public static function getActionName($controller, &$params)
+    {
+        $actionName = $params[0] . 'Action';
+        if (method_exists($controller, $actionName)) {
+            unset($params[0]);
+            return $actionName;
+        } else {
+            return 'indexAction';
+        }
+    }
+
 }

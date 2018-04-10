@@ -59,12 +59,8 @@ final class Router
         $actionName = $currentRouteValues['action'];
         $actionParams = $currentRouteValues['params'];
 
-        try {
             $controllerName = new $controllerPath();
             $controllerName -> $actionName($actionParams);
-        } catch (Exception $ex) {
-            echo '<p>ERROR</p>';
-        }
     }
 
     /**
@@ -101,8 +97,8 @@ final class Router
             }
         }
 
-        if ($isRoute) {
-            return $this->getActionController($controllerPath, $currentRoute, $valuesRoute);
+        if ($isRoute && isset($currentRoute->module)) {
+            return $this->getActionController($controllerPath, $currentRoute->module, $valuesRoute);
         } else {
             echo '<p>Page not found</p>';
             die();
@@ -118,13 +114,8 @@ final class Router
      */
     private function getActionController($controllerPath, $moduleName, $uriParams)
     {
-        $controllerPath = Config::getModulePath($moduleName->module) . '\\' . Config::getFilePath($controllerPath, 'controller') . 'Controller';
-        if (isset($moduleName->action)) {
-            $actionName = $moduleName->action . 'Action';
-        } else {
-            /*********************       CUSTOM_ERROR: PAGE DOES NOT EXIST        *************************/
-            //$actionName = 'indexAction';
-        }
+        $controllerPath = Config::getModulePath($moduleName) . '\\' . Config::getFilePath($controllerPath, 'controller') . 'Controller';
+        $actionName = Config::getActionName($controllerPath, $uriParams);
         return ['controller' => $controllerPath, 'action' => $actionName, 'params' => $uriParams];
     }
 
