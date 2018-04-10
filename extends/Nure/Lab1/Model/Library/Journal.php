@@ -19,12 +19,14 @@ class Journal extends LibraryAbstract implements JournalInterface
 
     public function getJournalByName($name)
     {
-
+        return $this->getLibraryItemByName('journal', $name);
     }
 
     public function getJournalByPeriod($beginDate, $endDate)
     {
-
+        $beginDate = $this->getFormatDate($beginDate,'Y');
+        $endDate = $this->getFormatDate($endDate,'Y');
+        return $this->getLibraryItemByPeriod('journal', $beginDate, $endDate);
     }
 
 }

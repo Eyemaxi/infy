@@ -11,7 +11,7 @@ class DataBase
 {
     public static function getConnection() {
         $xml = simplexml_load_file(ROOT . '/cfg/database.xml');
-        $params = $xml->db_params;
+        $params = $xml->database;
 
         $dsn = "mysql:host={$params->host};dbname={$params->db};charset={$params->charset}";
         try {

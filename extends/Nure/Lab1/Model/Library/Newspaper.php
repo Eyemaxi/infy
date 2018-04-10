@@ -13,11 +13,13 @@ class Newspaper extends LibraryAbstract implements NewspaperInterface
 
     public function getNewspaperByName($name)
     {
-
+        return $this->getLibraryItemByName('newspaper', $name);
     }
 
     public function getNewspaperByPeriod($beginDate, $endDate)
     {
-
+        $beginDate = $this->getFormatDate($beginDate,'Y-m-d');
+        $endDate = $this->getFormatDate($endDate,'Y-m-d');
+        return $this->getLibraryItemByPeriod('newspaper', $beginDate, $endDate);
     }
 }

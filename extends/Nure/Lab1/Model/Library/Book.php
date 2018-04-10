@@ -30,25 +30,21 @@ class Book extends LibraryAbstract implements BookInterface
     protected $numberPages;
 
     public function getBookByName($name)
-    {/*
-        try {
-            $stmt = $db->prepare("INSERT INTO test (label,color) VALUES (?,?)");
-            $stmt -> execute(array('perfect','green'));
-        }
-        catch(PDOException $e){
-            echo 'Error : '.$e->getMessage();
-            exit();
-        }
-    */
+    {
+        return $this->getLibraryItemByName('book', $name);
     }
 
     public function getBookByPeriod($beginDate, $endDate)
     {
-
+        $beginDate = $this->getFormatDate($beginDate,'Y');
+        $endDate = $this->getFormatDate($endDate,'Y');
+        return $this->getLibraryItemByPeriod('book', $beginDate, $endDate);
     }
 
     public function getBookByAuthor($author)
     {
-
+        $authorIds = $this->getAuthorIdsByName($author);
+        $bookIds = $this->getBookIdsByAuthorId($authorIds[0]);
+        return $this->getBooksByBookIds($bookIds);
     }
 }

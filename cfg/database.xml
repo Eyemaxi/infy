@@ -4,7 +4,7 @@
         <host>localhost</host>
         <db>laba1</db>
         <user>root</user>
-        <pass></pass>
+        <pass>dev01</pass>
         <charset>utf8</charset>
     </database>
 </config>
