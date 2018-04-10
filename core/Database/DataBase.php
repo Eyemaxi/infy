@@ -1,5 +1,5 @@
 <?php
-namespace Infy\Core\Components;
+namespace Infy\Core\Database;
 
 /**
  * Created by PhpStorm.
@@ -10,13 +10,13 @@ namespace Infy\Core\Components;
 class DataBase
 {
     public static function getConnection() {
-        $xml = simplexml_load_file(ROOT . '/config/config.xml');
+        $xml = simplexml_load_file(ROOT . '/cfg/database.xml');
         $params = $xml->db_params;
 
         $dsn = "mysql:host={$params->host};dbname={$params->db};charset={$params->charset}";
         try {
-            $pdo = new PDO($dsn, $params->user, $params->pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        } catch (PDOException $e) {
+            $pdo = new \PDO($dsn, $params->user, $params->pass, [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        } catch (\PDOException $e) {
             die('Подключение не удалось: ' . $e->getMessage());
         }
         //$db = new PDO("mysql:host=$host;dbname=$dbname", $user, $password);

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config>
+    <module>
+        <Namespace>Nure</Namespace>
+        <ModuleName>Lab1</ModuleName>
+        <active>true</active>
+    </module>
+</config>

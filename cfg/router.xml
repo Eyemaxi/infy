@@ -3,11 +3,14 @@
   <routes>
     <main>
       <products>
-        <action>index</action>
         <module>Web4pro_Products</module>
       </products>
-      <action>index</action>
       <module>Infy_Test</module>
     </main>
+    <nure>
+      <lab1>
+        <module>Nure_Lab1</module>
+      </lab1>
+    </nure>
   </routes>
 </config>

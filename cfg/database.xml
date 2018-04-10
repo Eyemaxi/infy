@@ -2,7 +2,7 @@
 <config>
     <database>
         <host>localhost</host>
-        <db>mvctest_db</db>
+        <db>laba1</db>
         <user>root</user>
         <pass></pass>
         <charset>utf8</charset>

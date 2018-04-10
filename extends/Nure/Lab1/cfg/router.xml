@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <config>
     <routes>
-        <main>
-            <products>
+        <nure>
+            <lab1>
                 <use/>
-            </products>
-        </main>
+            </lab1>
+        </nure>
     </routes>
 </config>

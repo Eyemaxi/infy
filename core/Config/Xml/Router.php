@@ -103,9 +103,11 @@ class Router
     private static function relationModuleController($moduleName, \SimpleXMLElement &$routesXmls)
     {
         foreach ($routesXmls as $key => $value) {
-            if(is_object($value)) {
-                if (isset($value->action) && !isset($value->module)) {
+            if (is_object($value)) {
+                if (isset($value->use) && !isset($value->module)) {
                     $value->addChild('module', $moduleName);
+                    $dom = dom_import_simplexml($value->use);
+                    $dom->parentNode->removeChild($dom);
                 }
                 self::relationModuleController($moduleName, $value);
             }
@@ -134,7 +136,7 @@ class Router
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                if ($key != 'action' && $key != 'module') {
+                if ($key != 'module') {
                     if (!is_numeric($key)) {
                         $subnode = $xml->addChild("$key");
                         self::arrayToXml($value, $subnode);
@@ -155,10 +157,12 @@ class Router
     private static function xmlToArray ($xmlObject, $out = array())
     {
         foreach ((array) $xmlObject as $index => $node) {
-            if (is_object($node)) {
-                $out[$index] = self::xmlToArray($node);
-            } else {
-                $out[$index] = $node;
+            if (!is_numeric($index)) {
+                if (is_object($node)) {
+                    $out[$index] = self::xmlToArray($node);
+                } else {
+                    $out[$index] = $node;
+                }
             }
         }
         return $out;
