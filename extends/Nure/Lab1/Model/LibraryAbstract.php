@@ -1,7 +1,7 @@
 <?php
 
 namespace Nure\Lab1\Model;
-use Infy\Core\Database\DataBase;
+use Infy\Core\App\Database\DataBase;
 
 /**
  * Class LibraryAbstract
@@ -47,7 +47,7 @@ abstract class LibraryAbstract
             return $libraryItems;
 
         }
-        catch(PDOException $e){
+        catch(\PDOException $e){
             echo 'Error : '.$e->getMessage();
             exit();
         }
@@ -77,7 +77,7 @@ abstract class LibraryAbstract
             }
 
             return $libraryItems;
-        } catch(PDOException $e){
+        } catch(\PDOException $e){
             echo 'Error : '.$e->getMessage();
             exit();
         }
@@ -97,7 +97,7 @@ abstract class LibraryAbstract
             return $authorIds;
 
         }
-        catch(PDOException $e){
+        catch(\PDOException $e){
             echo 'Error : '.$e->getMessage();
             exit();
         }
@@ -116,7 +116,7 @@ abstract class LibraryAbstract
             return $bookIds;
 
         }
-        catch(PDOException $e){
+        catch(\PDOException $e){
             echo 'Error : '.$e->getMessage();
             exit();
         }
@@ -137,7 +137,7 @@ abstract class LibraryAbstract
             return $books;
 
         }
-        catch(PDOException $e){
+        catch(\PDOException $e){
             echo 'Error : '.$e->getMessage();
             exit();
         }

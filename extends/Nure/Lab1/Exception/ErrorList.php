@@ -7,9 +7,12 @@
  */
 
 namespace Nure\Lab1\Exception;
+use Infy\Core\App\Exception\ExceptionList;
 
-
-class ErrorList
+class ErrorList implements ExceptionList\ErrorListInterface
 {
-
+    public function execute(ExceptionList\ErrorList $errorList)
+    {
+        $errorList->setCritical('NOT_BOOK', ['class_name']);
+    }
 }
