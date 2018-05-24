@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config>
+  <routes>
+    <main>
+      <products>
+        <module>Web4pro\Products</module>
+      </products>
+      <module>Infy\Test</module>
+    </main>
+    <nure>
+      <lab1>
+        <module>Nure\Lab1</module>
+      </lab1>
+    </nure>
+  </routes>
+</config>

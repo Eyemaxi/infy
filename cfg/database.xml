@@ -2,7 +2,7 @@
 <config>
     <database>
         <host>localhost</host>
-        <db>laba1</db>
+        <db>laba11</db>
         <user>root</user>
         <pass>dev01</pass>
         <charset>utf8</charset>
