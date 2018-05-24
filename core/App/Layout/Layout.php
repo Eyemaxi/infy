@@ -6,7 +6,7 @@
  * Time: 13:43
  */
 
-namespace Infy\Core\Layout;
+namespace Infy\Core\App\Layout;
 
 
 class Layout

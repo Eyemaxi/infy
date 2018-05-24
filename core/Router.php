@@ -10,27 +10,19 @@
  */
 
 namespace Infy\Core;
-use Infy\Core\Config\Xml\Router as RouterXml;
+
+use Infy\Core\App\Exception\InfyException;
 use Infy\Core\Config\Config;
-use Infy\Core\Infy;
 
 /**
  * Class Router
  *
  * @category Core
- * @package  Infy\Core
- * @author   <maksimglaz@gmail.com>
+ * @package Infy\Core
+ * @author <maksimglaz@gmail.com>
  */
 final class Router
 {
-    /**
-     * Object redirects.
-     *
-     * @var \SimpleXMLElement
-     * @access private
-     */
-    private $redirects;
-
     /**
      * Object routes.
      *
@@ -40,36 +32,92 @@ final class Router
     private $routes;
 
     /**
-     * Router constructor.
+     * @var Config\Xml\Router
      */
-    public function __construct() {
-        /* Get all redirects */
-        $this->redirects = RouterXml::getRedirects();
+    protected $_routerXml;
+
+    /**
+     * @var Config\Config
+     */
+    protected $_config;
+
+    /**
+     * @var App\ObjectManager
+     */
+    protected $_objectManager;
+
+    /**
+     * @var App\Http\Request 
+     */
+    protected $_request;
+
+    /**
+     * Router constructor.
+     * @param \Infy\Core\Config\Xml\Router $routerXml
+     * @param Config $config
+     * @param App\ObjectManager $objectManager
+     * @param App\Http\Request $request
+     */
+    public function __construct(
+        \Infy\Core\Config\Xml\Router $routerXml,
+        Config $config,
+        \Infy\Core\App\ObjectManager $objectManager,
+        \Infy\Core\App\Http\Request $request
+    ) {
+        $this->_routerXml = $routerXml;
+        $this->_config = $config;
+        $this->_objectManager = $objectManager;
+        $this->_request = $request;
         /* Get all routes */
-        $this->routes = RouterXml::getRoutes();
+        $this->routes = $this->_routerXml->getRoutes();
     }
 
     /**
      * Creating object class Controller and executing Action method
+     *
+     * @access public
+     * @return void
+     * @throws App\Exception\InfyException
      */
-    public function run() {
+    public function run()
+    {
         /* Get Controller and Action for route */
-        $currentRouteValues = $this -> getRouteValues();
+        $currentRouteValues = $this->getRouteValues();
         $controllerPath = $currentRouteValues['controller'];
         $actionName = $currentRouteValues['action'];
         $actionParams = $currentRouteValues['params'];
+        $this->_request->setUriParams($actionParams);
 
-            $controllerName = new $controllerPath();
-            $controllerName -> $actionName($actionParams);
+        if (class_exists($controllerPath)) {
+            $controllerName = $this->_objectManager->getObject($controllerPath);
+            if (method_exists($controllerPath, $actionName)) {
+                $controllerName->$actionName();
+            } else {
+                throw new InfyException(
+                    'ACTION_DOES_NOT_EXISTS',
+                    InfyException::ERROR_TYPE_CRITICAL,
+                    ['controller' => $controllerPath, 'action' => $actionName]
+                );
+            }
+        } else {
+            throw new InfyException(
+                'CONTROLLER_DOES_NOT_EXISTS',
+                InfyException::ERROR_TYPE_CRITICAL,
+                ['controller' => $controllerPath]
+            );
+        }
     }
 
     /**
      * Return Controller Path, Action with Parameters
+     *
+     * @access private
      * @return array
      */
-    private function getRouteValues() {
+    private function getRouteValues()
+    {
         /* Get URI parameters */
-        $uriParams = $this->getUriParams();
+        $uriParams = $this->_request->getUriParams();
 
         /* Path to Controller */
         $controllerPath = [];
@@ -100,6 +148,7 @@ final class Router
         if ($isRoute && isset($currentRoute->module)) {
             return $this->getActionController($controllerPath, $currentRoute->module, $valuesRoute);
         } else {
+            /********************************* PAGE NOT FOUND *********************************/
             echo '<p>Page not found</p>';
             die();
         }
@@ -107,6 +156,8 @@ final class Router
 
     /**
      * Get Controller Path, Action with Parameters
+     *
+     * @access private
      * @param $controllerPath
      * @param $moduleName
      * @param $uriParams
@@ -114,56 +165,12 @@ final class Router
      */
     private function getActionController($controllerPath, $moduleName, $uriParams)
     {
-        $controllerPath = Config::getModulePath($moduleName) . '\\' . Config::getFilePath($controllerPath, 'controller') . 'Controller';
-        $actionName = Config::getActionName($controllerPath, $uriParams);
+        $controllerPath = implode('\\', [
+            $this->_config->getModuleNamespaceByAlias($moduleName),
+            $this->_config->getFileNamespace($controllerPath, Config::MODULE_CLASS_TYPE_CONTROLLER)
+        ]);
+        $actionName = $this->_config->getActionName($controllerPath, $uriParams);
         return ['controller' => $controllerPath, 'action' => $actionName, 'params' => $uriParams];
-    }
-
-    /**
-     * Return URI parameters
-     * @return array
-     */
-    private function getUriParams(){
-        $uri = strval($this->getURI());
-        $uriParams = explode('/', $uri);
-        $this->isRedirect($uriParams);
-        return $uriParams;
-    }
-
-    /**
-     * Returns request string
-     * @return string
-     */
-    private function getURI(){
-        if (!empty($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI']!='/') {
-            return trim($_SERVER['REQUEST_URI'], '/');
-        } else {
-            if (isset($this->redirects->root)) {
-                Infy::_redirect(strval($this->redirects->root));
-            }
-        }
-    }
-
-    /**
-     * Looking for redirects
-     * @param $uriParams
-     */
-    private function isRedirect($uriParams)
-    {
-        $redirectUri = '';
-        $currentRoute = $this->redirects->redirects;
-        foreach ($uriParams as $uriParam) {
-            if (isset($currentRoute->$uriParam)) {
-                if (isset($currentRoute->$uriParam->new_route_param)) {
-                    $redirectUri .= $currentRoute->$uriParam->new_route_param . '/';
-                    $currentRoute = $currentRoute->$uriParam;
-                }
-            }
-        }
-
-        if ($redirectUri != '') {
-            Infy::_redirect($redirectUri);
-        }
     }
 
 }

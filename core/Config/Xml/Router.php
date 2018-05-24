@@ -1,106 +1,152 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: dev01
- * Date: 26.02.18
- * Time: 12:58
+ * Infy Framework
+ *
+ * @author    <maksimglaz@gmail.com>
+ * @category  Core
+ * @package   Infy\Core
+ * @copyright Copyright (c) 2018 Infy
+ * @license   https://www.infy-team.com/license.txt
  */
 
 namespace Infy\Core\Config\Xml;
+
+use Infy\Core\App\Exception\InfyException;
 use Infy\Core\Config\Config;
 
-
-class Router
+/**
+ * Class Router
+ *
+ * @category Core
+ * @package Infy\Core\Config\Xml
+ * @author <maksimglaz@gmail.com>
+ */
+final class Router
 {
+    const PATH_MAIN_ROUTER = ROOT . '/cfg/router.xml';
+
     /**
+     * @var Config
+     */
+    protected $_config;
+
+    /**
+     * Router constructor.
+     * @param Config $config
+     */
+    public function __construct(Config $config)
+    {
+        $this->_config = $config;
+    }
+
+    /**
+     * Get redirects
+     *
+     * @access public
      * @param string $path
      * @return \SimpleXMLElement
      */
-    public static function getRedirects($path = ROOT)
+    public function getRedirects($path = ROOT)
     {
         if (file_exists($path . '/cfg/redirects.xml')) {
             $redirects = simplexml_load_file($path . '/cfg/redirects.xml');
             return $redirects;
+        } else {
+            return null;
         }
     }
 
     /**
+     * Get routes
+     *
+     * @access public
      * @param string $path
      * @return \SimpleXMLElement
      */
-    public static function getRoutes($path = ROOT)
+    public function getRoutes($path = ROOT)
     {
         if (file_exists($path . '/cfg/router.xml')) {
             $router = simplexml_load_file($path . '/cfg/router.xml');
             return $router;
+        } else {
+            return null;
         }
     }
 
     /**
-     * @param $modulePath
-     * @return \SimpleXMLElement
+     * Merge all routes
+     *
+     * @access public
+     * @return void
+     * @throws InfyException
      */
-    public static function getModuleName($modulePath)
-    {
-        if (file_exists($modulePath . '/cfg/module.xml')) {
-            $module = simplexml_load_file($modulePath . '/cfg/module.xml');
-            return $module->module;
-        }
-    }
-
-    public static function mergeRoutes()
+    public function mergeRoutes()
     {
         $domxml = new \DOMDocument('1.0');
         $domxml->preserveWhiteSpace = false;
         $domxml->formatOutput = true;
         $xml = new \SimpleXMLElement('<config/>');
 
-        $dir = ROOT.'/extends';
-        $namespaceList = Config::extendsNamesValidate(scandir($dir));
-        foreach ($namespaceList as $namespace) {
-            $dirNamespace = $dir . '/' . $namespace;
-            $moduleList = Config::extendsNamesValidate(scandir($dirNamespace));
-            foreach ($moduleList as $module) {
-                $dirModule = $dirNamespace . '/' . $module;
-                $moduleRoutes = self::getModuleRoutes($dirModule);
-                if ($moduleRoutes != null) {
-                    $xml = self::mergeSimpleXml($xml, $moduleRoutes);
+        $xml = $this->mergeRoutesByDirectory($xml, Config::DIRECTORY_TYPE_COMMUNITY);
+        $xml = $this->mergeRoutesByDirectory($xml, Config::DIRECTORY_TYPE_EXTENDS);
+
+        $domxml->loadXML($xml->asXML());
+        $domxml->save(self::PATH_MAIN_ROUTER);
+    }
+
+    /**
+     * Merge routes by directory
+     *
+     * @access private
+     * @param $xml
+     * @param $dir
+     * @return \SimpleXMLElement
+     * @throws InfyException
+     */
+    private function mergeRoutesByDirectory($xml, $dir)
+    {
+        $modules = $this->_config->getModulesByDir($dir);
+        if (!is_null($modules)) {
+            foreach ($modules as $module) {
+                $moduleRoutes = $this->getModuleRoutes($module);
+                if (!is_null($moduleRoutes)) {
+                    $xml = $this->mergeSimpleXmls($xml, $moduleRoutes);
                 }
             }
         }
 
-        $domxml->loadXML($xml->asXML());
-        $domxml->save(ROOT . '/cfg/router.xml');
+        return $xml;
     }
 
-    private static function getModuleRoutes($dir)
+    /**
+     * Get module routes
+     *
+     * @access private
+     * @param $module
+     * @return mixed|null
+     */
+    private function getModuleRoutes($module)
     {
-        $cfgXmls = self::getCfgXmls($dir);
-        if ($cfgXmls != null) {
-            $moduleXml = $cfgXmls['module'];
-            if ($moduleXml->active == 'true') {
-                $moduleName = strval($moduleXml->Namespace) . '_' . strval($moduleXml->ModuleName);
-                $routesXmls = $cfgXmls['routes'];
-                self::relationModuleController($moduleName, $routesXmls);
-                return $routesXmls;
+        if ($module['active'] == 'true') {
+            $moduleName = $module['namespace'];
+            $routesXml = $this->getRoutes($module['dir_path']);
+            if (!is_null($routesXml)) {
+                $this->bindModuleRoute($moduleName, $routesXml);
+                return $routesXml;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
-    private static function getCfgXmls($dir)
-    {
-        if (file_exists($dir . '/cfg/module.xml') && file_exists($dir . '/cfg/router.xml')) {
-            $moduleXml = self::getModuleName($dir);
-            $routesXml = self::getRoutes($dir);
-            return ['module' => $moduleXml, 'routes' => $routesXml];
-        } else {
-            return null;
-        }
-    }
-
-    private static function relationModuleController($moduleName, \SimpleXMLElement &$routesXmls)
+    /**
+     * Bind module to route
+     *
+     * @access private
+     * @param $moduleName
+     * @param \SimpleXMLElement $routesXmls
+     * @return void
+     */
+    private function bindModuleRoute($moduleName, \SimpleXMLElement &$routesXmls)
     {
         foreach ($routesXmls as $key => $value) {
             if (is_object($value)) {
@@ -109,57 +155,89 @@ class Router
                     $dom = dom_import_simplexml($value->use);
                     $dom->parentNode->removeChild($dom);
                 }
-                self::relationModuleController($moduleName, $value);
+                $this->bindModuleRoute($moduleName, $value);
             }
         }
     }
 
 
-
-    private static function mergeSimpleXml(\SimpleXMLElement $xml, \SimpleXMLElement $routes)
+    /**
+     * Merge two SimpleXml objects
+     *
+     * @access private
+     * @param \SimpleXMLElement $xml
+     * @param \SimpleXMLElement $routes
+     * @return \SimpleXMLElement
+     * @throws InfyException
+     */
+    private function mergeSimpleXmls(\SimpleXMLElement $xml, \SimpleXMLElement $routes)
     {
-        $router1 = self::xmlToArray($xml);
-        $router2 = self::xmlToArray($routes);
+        $router1 = $this->xmlToArray($xml);
+        $router2 = $this->xmlToArray($routes);
         $router = array_merge_recursive($router2, $router1);
-        array_multisort($router, SORT_ASC, SORT_NATURAL);
 
-        //creating object of SimpleXMLElement
+        /* Creating object of SimpleXMLElement */
         $xml = new \SimpleXMLElement("<config/>");
 
-        //function call to convert array to xml
-        self::arrayToXml($router,$xml);
+        /* Function call to convert array to xml */
+        $this->arrayToXml($router, $xml);
 
         return $xml;
     }
 
-    private static function arrayToXml($array, &$xml)
+    /**
+     * Convert array to xml object
+     *
+     * @access private
+     * @param $array
+     * @param $xml
+     * @return void
+     * @throws InfyException
+     */
+    private function arrayToXml($array, &$xml)
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
                 if ($key != 'module') {
                     if (!is_numeric($key)) {
                         $subnode = $xml->addChild("$key");
-                        self::arrayToXml($value, $subnode);
+                        $this->arrayToXml($value, $subnode);
                     } else {
                         $subnode = $xml->addChild("item$key");
-                        self::arrayToXml($value, $subnode);
+                        $this->arrayToXml($value, $subnode);
                     }
                 } else {
-                    /********************       WARNING        ***************************/
-                    $xml->addChild("$key",htmlspecialchars("$value[0]"));
+                    try {
+                        throw new InfyException(
+                            'MODULES_COLLISION_IN_ROUTE',
+                            InfyException::ERROR_TYPE_WARNING,
+                            ['modules' => $value, 'route' => $_GET['route']]
+                        );
+                    } catch (InfyException $e) {
+                        $e->getErrorMessage();
+                    }
+                    $xml->addChild("$key", htmlspecialchars("$value[0]"));
                 }
             } else {
-                $xml->addChild("$key",htmlspecialchars("$value"));
+                $xml->addChild("$key", htmlspecialchars("$value"));
             }
         }
     }
 
-    private static function xmlToArray ($xmlObject, $out = array())
+    /**
+     * Convert xml object to array
+     *
+     * @access private
+     * @param $xmlObject
+     * @param array $out
+     * @return array
+     */
+    private function xmlToArray($xmlObject, $out = array())
     {
-        foreach ((array) $xmlObject as $index => $node) {
+        foreach ((array)$xmlObject as $index => $node) {
             if (!is_numeric($index)) {
                 if (is_object($node)) {
-                    $out[$index] = self::xmlToArray($node);
+                    $out[$index] = $this->xmlToArray($node);
                 } else {
                     $out[$index] = $node;
                 }
